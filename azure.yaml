@@ -1,0 +1,16 @@
+name: claimpilot-ai
+metadata:
+  template: claimpilot-ai@1.0.0
+services:
+  web:
+    project: .
+    language: docker
+    host: containerapp
+    docker:
+      path: backend/Dockerfile
+      context: .
+      buildArgs:
+        - VITE_DEMO_MODE=cached
+        - VITE_MSAL_CLIENT_ID=${ENTRA_CLIENT_ID}
+        - VITE_MSAL_TENANT_ID=${AZURE_TENANT_ID}
+        - VITE_MSAL_API_SCOPE=api://${ENTRA_CLIENT_ID}/user_impersonation

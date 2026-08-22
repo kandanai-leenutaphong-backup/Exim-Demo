@@ -1,0 +1,16 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "environmentName": { "value": "${AZURE_ENV_NAME}" },
+    "location": { "value": "${AZURE_LOCATION}" },
+    "entraClientId": { "value": "${ENTRA_CLIENT_ID}" },
+    "entraTenantId": { "value": "${AZURE_TENANT_ID}" },
+    "foundryChatDeployment": { "value": "${FOUNDRY_CHAT_DEPLOYMENT}" },
+    "foundryChatModel": { "value": "${FOUNDRY_CHAT_MODEL}" },
+    "foundryChatModelVersion": { "value": "${FOUNDRY_CHAT_MODEL_VERSION}" },
+    "foundryEmbeddingDeployment": { "value": "${FOUNDRY_EMBEDDING_DEPLOYMENT}" },
+    "foundryEmbeddingModel": { "value": "${FOUNDRY_EMBEDDING_MODEL}" },
+    "foundryEmbeddingModelVersion": { "value": "${FOUNDRY_EMBEDDING_MODEL_VERSION}" }
+  }
+}
