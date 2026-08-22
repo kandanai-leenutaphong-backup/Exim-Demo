@@ -1410,6 +1410,208 @@ td small {
   line-height: 1.55;
 }
 
+.document-visual {
+  display: grid;
+  overflow: hidden;
+  margin-top: 14px;
+  grid-template-columns: minmax(0, 1.35fr) minmax(240px, 0.65fr);
+  border: 1px solid var(--cp-border);
+  border-radius: 10px;
+  background: var(--cp-surface);
+}
+
+.document-canvas {
+  padding: 14px;
+  border-right: 1px solid var(--cp-border);
+  background: var(--cp-surface-soft);
+}
+
+.document-caption {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.document-caption > svg {
+  color: var(--cp-accent);
+}
+
+.document-caption span,
+.document-caption strong,
+.document-caption small {
+  display: block;
+}
+
+.document-caption strong {
+  font-size: 11px;
+}
+
+.document-caption small {
+  margin-top: 1px;
+  color: var(--cp-text-muted);
+  font-size: 9px;
+}
+
+.annotated-page {
+  position: relative;
+  overflow: hidden;
+  width: min(100%, 480px);
+  margin: 0 auto;
+  border: 1px solid var(--cp-border);
+  background: var(--cp-surface);
+}
+
+.annotated-page img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.region-box {
+  position: absolute;
+  border: 3px solid var(--cp-warning);
+  background: var(--cp-accent-soft);
+  pointer-events: none;
+}
+
+.region-label {
+  position: absolute;
+  display: block;
+  max-width: 46%;
+  padding: 7px 9px;
+  border: 1px solid var(--cp-warning);
+  border-radius: 10px;
+  background: var(--cp-panel-strong);
+  color: var(--cp-text);
+  box-shadow: 0 0 2px var(--cp-border);
+}
+
+.region-label::before {
+  position: absolute;
+  width: 28px;
+  height: 2px;
+  background: var(--cp-warning);
+  content: "";
+}
+
+.region-label strong,
+.region-label small {
+  display: block;
+}
+
+.region-label strong {
+  font-size: 10px;
+}
+
+.region-label small {
+  margin-top: 2px;
+  color: var(--cp-text-muted);
+  font-size: 8px;
+  line-height: 1.4;
+}
+
+.ocr-page .region-box {
+  top: 24.1%;
+  left: 9.5%;
+  width: 80.5%;
+  height: 3.7%;
+}
+
+.ocr-page .region-label {
+  top: 29.5%;
+  right: 3%;
+}
+
+.ocr-page .region-label::before {
+  top: -15px;
+  right: 28px;
+  transform: rotate(-55deg);
+  transform-origin: right center;
+}
+
+.policy-page .region-box {
+  top: 10.9%;
+  left: 8.8%;
+  width: 83%;
+  height: 5.1%;
+  border-color: var(--cp-link);
+}
+
+.policy-page .region-label {
+  top: 18%;
+  right: 3%;
+  border-color: var(--cp-link);
+}
+
+.policy-page .region-label::before {
+  top: -17px;
+  right: 30px;
+  background: var(--cp-link);
+  transform: rotate(-52deg);
+  transform-origin: right center;
+}
+
+.visual-output {
+  padding: 18px;
+}
+
+.visual-output dl {
+  margin: 0;
+}
+
+.visual-output dl div {
+  padding: 10px 0;
+  border-bottom: 1px solid var(--cp-border);
+}
+
+.visual-output dt {
+  color: var(--cp-text-muted);
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.visual-output dd {
+  margin: 3px 0 0;
+  font-family: Consolas, "Courier New", Courier, monospace;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.output-warning {
+  color: var(--cp-warning);
+}
+
+.visual-decision {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 14px;
+  padding: 10px;
+  border-left: 3px solid var(--cp-success);
+  background: var(--cp-surface-soft);
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.visual-decision.warning {
+  border-left-color: var(--cp-warning);
+}
+
+.visual-decision svg {
+  flex: 0 0 auto;
+  color: var(--cp-success);
+}
+
+.visual-decision.warning svg {
+  color: var(--cp-warning);
+}
+
+.visual-decision strong {
+  display: block;
+}
+
 .flow-arrow {
   align-self: center;
   color: var(--cp-accent);
@@ -1805,6 +2007,15 @@ td small {
 
   .inspector-flow {
     grid-template-columns: 1fr;
+  }
+
+  .document-visual {
+    grid-template-columns: 1fr;
+  }
+
+  .document-canvas {
+    border-right: 0;
+    border-bottom: 1px solid var(--cp-border);
   }
 
   .flow-arrow {

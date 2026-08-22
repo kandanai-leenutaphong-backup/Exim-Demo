@@ -606,6 +606,7 @@ function AnalysisCard({ panel, index }: { panel: AnalysisPanel; index: number })
                 <div><small>OUTPUT · ผลที่ส่งต่อ</small><strong>{panel.detailTh}</strong></div>
               </article>
             </div>
+            {(panel.type === "OCR" || panel.type === "FOUNDRY IQ PATTERN") && <DocumentVisual type={panel.type} />}
             <div className="inspector-guardrail">
               <ShieldCheck size={17} />
               <span><strong>การควบคุม:</strong> {low ? "ผลต่ำกว่า 60% ถูกทำเครื่องหมายว่ายังไม่ยืนยัน และห้ามนำไปคำนวณต่อ" : "ผลลัพธ์ถูกบันทึกพร้อมเวลา ผู้ใช้งาน และแหล่งข้อมูลเพื่อการตรวจสอบย้อนหลัง"}</span>
@@ -618,6 +619,55 @@ function AnalysisCard({ panel, index }: { panel: AnalysisPanel; index: number })
         )}
       </div>
     </article>
+  );
+}
+
+function DocumentVisual({ type }: { type: "OCR" | "FOUNDRY IQ PATTERN" }) {
+  const isOcr = type === "OCR";
+  return (
+    <div className="document-visual">
+      <div className="document-canvas">
+        <div className="document-caption">
+          <FileText size={15} />
+          <span><strong>{isOcr ? "03_bill_of_lading.pdf" : "08_policy.pdf"}</strong><small>{isOcr ? "Page 1 · degraded scan" : "Page 2 · indexed policy source"}</small></span>
+        </div>
+        <div className={`annotated-page ${isOcr ? "ocr-page" : "policy-page"}`}>
+          <img
+            src={isOcr ? "/documents/03_bill_of_lading.pdf/preview?page=1" : "/documents/08_policy.pdf/preview?page=2"}
+            alt={isOcr ? "Degraded bill of lading with shipment date row highlighted" : "Policy page with Clause 7.3 highlighted"}
+            loading="lazy"
+          />
+          <span className="region-box" />
+          <span className="region-label">
+            {isOcr ? <><strong>Shipment date</strong><small>อ่านได้ 2026-02-12 · Confidence 54%</small></> : <><strong>Retrieved evidence</strong><small>Clause 7.3 · Filing window · Page 2</small></>}
+          </span>
+        </div>
+      </div>
+      <div className="visual-output">
+        <p className="kicker">{isOcr ? "DOCUMENT INTELLIGENCE OUTPUT" : "GROUNDED RETRIEVAL OUTPUT"}</p>
+        {isOcr ? (
+          <>
+            <dl>
+              <div><dt>Field</dt><dd>shipment_date</dd></div>
+              <div><dt>Value read</dt><dd>2026-02-12</dd></div>
+              <div><dt>Confidence</dt><dd className="output-warning">54% · LOW</dd></div>
+              <div><dt>Downstream use</dt><dd className="output-warning">BLOCKED</dd></div>
+            </dl>
+            <div className="visual-decision warning"><AlertTriangle size={17} /><span><strong>ระบบไม่เชื่อค่าทันที</strong> วันที่นี้ถูกส่งต่อในสถานะ “ยังไม่ยืนยัน”</span></div>
+          </>
+        ) : (
+          <>
+            <dl>
+              <div><dt>Source</dt><dd>08_policy.pdf</dd></div>
+              <div><dt>Evidence</dt><dd>Clause 7.3, page 2</dd></div>
+              <div><dt>Rule found</dt><dd>180 calendar days</dd></div>
+              <div><dt>Case result</dt><dd className="output-warning">UNVERIFIED</dd></div>
+            </dl>
+            <div className="visual-decision"><ShieldCheck size={17} /><span><strong>คำตอบมีที่มา</strong> คลิก citation เพื่อเปิดหลักฐานหน้าเดียวกัน</span></div>
+          </>
+        )}
+      </div>
+    </div>
   );
 }
 

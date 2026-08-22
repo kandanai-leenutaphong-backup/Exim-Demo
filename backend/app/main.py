@@ -11,7 +11,7 @@ from azure.monitor.opentelemetry import configure_azure_monitor
 from azure.storage.blob import BlobServiceClient
 from fastapi import Depends, FastAPI, File, HTTPException, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, StreamingResponse
+from fastapi.responses import FileResponse, Response, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 
 from .audit import AuditStore
@@ -188,6 +188,30 @@ async def document(filename: str, request: Request):
     if not path.exists():
         raise HTTPException(404, "Document not found.")
     return FileResponse(path, media_type="application/pdf")
+
+
+@app.get("/documents/{filename}/preview")
+async def document_preview(filename: str, request: Request, page: int = 1):
+    allowed = {
+        "01_claim_form.pdf",
+        "02_commercial_invoice.pdf",
+        "03_bill_of_lading.pdf",
+        "04_packing_list.pdf",
+        "05_export_declaration.pdf",
+        "08_policy.pdf",
+    }
+    if filename not in allowed:
+        raise HTTPException(404, "Document preview not found.")
+    path: Path = request.app.state.settings.data_dir / "claim_pack" / filename
+    if not path.exists():
+        raise HTTPException(404, "Document preview not found.")
+    import fitz
+
+    with fitz.open(path) as source:
+        if page < 1 or page > source.page_count:
+            raise HTTPException(404, "Document page not found.")
+        image = source[page - 1].get_pixmap(matrix=fitz.Matrix(1.35, 1.35), alpha=False).tobytes("png")
+    return Response(image, media_type="image/png", headers={"Cache-Control": "public, max-age=3600"})
 
 
 static_dir = Path(__file__).parents[1] / "static"

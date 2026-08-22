@@ -82,6 +82,10 @@ where predictability matters more than creativity.
 **Click:** Expand `02 · OCR` using
 `ดูว่า AI รับอะไร และส่งอะไรออกมา`.
 
+**Point to the document image:** The highlighted shipment-date row is the exact
+region Document Intelligence is reading. The panel beside it shows the field
+name, value, 54 percent confidence, and `BLOCKED` downstream status.
+
 **Point from left to right:**
 
 1. **Input:** Claim form, invoice, bill of lading, and export declaration.
@@ -110,6 +114,10 @@ structured extraction with visible uncertainty.
 ## 3:10 to 4:05, demonstrate the Foundry IQ grounding pattern
 
 **Click:** Expand `04 · FOUNDRY IQ PATTERN`.
+
+**Point to the policy image:** The highlighted box is the exact Clause 7.3
+passage retrieved from page 2. The panel beside it separates the source,
+evidence location, rule found, and case-specific result.
 
 **Point from left to right:**
 
