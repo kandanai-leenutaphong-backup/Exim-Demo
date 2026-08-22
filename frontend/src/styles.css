@@ -1802,6 +1802,14 @@ td small {
   line-height: 1.55;
 }
 
+.why-it-matters small {
+  display: block;
+  margin-top: 5px;
+  color: var(--cp-text-muted);
+  font-size: 10px;
+  line-height: 1.5;
+}
+
 .bilingual {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -2492,6 +2500,30 @@ td small {
 .visual-decision svg {
   flex: 0 0 auto;
   color: var(--cp-success);
+}
+
+.journey-caption span,
+.journey-caption strong,
+.journey-caption b,
+.journey-caption small {
+  display: block;
+}
+
+.journey-caption strong {
+  color: var(--cp-success);
+  font-size: 9px;
+  letter-spacing: 0.08em;
+}
+
+.journey-caption b {
+  margin-top: 3px;
+  font-size: 12px;
+}
+
+.journey-caption small {
+  margin-top: 4px;
+  color: var(--cp-text-muted);
+  font-size: 10px;
 }
 
 .visual-decision.warning svg {

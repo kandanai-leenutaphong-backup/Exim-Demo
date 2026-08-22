@@ -5,6 +5,18 @@
 ClaimPilot reads a claim pack, finds the relevant policy rule, shows uncertainty
 instead of hiding it, and prepares evidence for a human officer to decide.
 
+## Why each step is needed
+
+| Step | English explanation |
+|---|---|
+| Vision | Claims cannot be reviewed reliably until the system knows which document types are present and which required evidence is missing. |
+| Document Intelligence | Business rules need structured values, not PDF images. Confidence scores prevent uncertain OCR results from silently becoming trusted facts. |
+| Language | The reason for non-payment is buried in multilingual correspondence. Language analysis turns that narrative into reviewable facts. |
+| Foundry IQ grounding pattern | Policy answers must come from approved source material. Grounding provides the relevant rule and a citation the officer can verify. |
+| Rule-based screening | Compliance screening must be repeatable and explainable. An exact rule-based lookup is safer here than a probabilistic AI answer. |
+| Machine learning | A readiness score helps officers prioritize attention across many cases while exposing the factors behind the estimate. |
+| Generative AI | The final evidence is structured but not easy to read. Generative AI converts only the approved panel results into a concise officer draft. |
+
 ## Before the audience arrives
 
 1. Open the deployed ClaimPilot URL and sign in.

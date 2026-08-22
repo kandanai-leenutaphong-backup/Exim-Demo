@@ -49,6 +49,7 @@ const panelDefaults: AnalysisPanel[] = [
     detailTh: "พบเอกสาร 8 จาก 10 รายการ โดยขาดหนังสือมอบอำนาจและหลักฐานการส่งมอบ",
     detailEn: "Eight of ten required documents are present. Power of Attorney and Proof of Delivery are missing.",
     whyTh: "ช่วยให้เจ้าหน้าที่เห็นทันทีว่าเอกสารใดขาด ก่อนเริ่มพิจารณา",
+    whyEn: "Claims cannot be reviewed reliably until the system knows which document types are present and which required evidence is missing.",
     confidence: 0.91
   },
   {
@@ -61,6 +62,7 @@ const panelDefaults: AnalysisPanel[] = [
     detailTh: "วันที่ส่งสินค้า 2026-02-12 จาก 03_bill_of_lading.pdf มีความเชื่อมั่นเพียง 54% และต้องตรวจสอบใหม่",
     detailEn: "Shipment date 2026-02-12 from 03_bill_of_lading.pdf is only 54% confident and must be rechecked.",
     whyTh: "ระบบอ่านเอกสารสแกนพร้อมบอกความมั่นใจ จึงไม่ส่งวันที่ที่ไม่น่าเชื่อถือไปคำนวณต่อ",
+    whyEn: "Business rules need structured values, not PDF images. Confidence scores prevent uncertain OCR results from silently becoming trusted facts.",
     confidence: 0.54
   },
   {
@@ -73,6 +75,7 @@ const panelDefaults: AnalysisPanel[] = [
     detailTh: "ผู้ซื้ออ้างถึงความล่าช้าในการขนส่ง และไม่พบข้อพิพาทอย่างเป็นทางการ",
     detailEn: "Buyer cites a shipping delay; no formal dispute is present.",
     whyTh: "สรุปอีเมลภาษาไทยและอังกฤษให้เป็นประเด็นที่ตรวจสอบได้",
+    whyEn: "The reason for non-payment is buried in multilingual correspondence. Language analysis turns that narrative into reviewable facts.",
     confidence: 0.99
   },
   {
@@ -85,6 +88,7 @@ const panelDefaults: AnalysisPanel[] = [
     detailTh: "ข้อ 7.3 กำหนดกรอบ 180 วัน แต่ยังยืนยันผลไม่ได้เพราะวันที่ส่งสินค้ามีความเชื่อมั่นต่ำ",
     detailEn: "Clause 7.3 sets a 180-day window, but the result cannot be confirmed because the shipment date is low confidence.",
     whyTh: "คำตอบเชื่อมกลับไปยังข้อ 7.3 หน้า 2 เจ้าหน้าที่จึงเปิดตรวจหลักฐานต้นทางได้",
+    whyEn: "Policy answers must come from approved source material. Grounding provides the relevant rule and a citation the officer can verify.",
     confidence: 1,
     citationPage: 2
   },
@@ -98,6 +102,7 @@ const panelDefaults: AnalysisPanel[] = [
     detailTh: "การค้นหาแบบกำหนดตายตัวพบรายการ Zantara Meridian Trading Co. และส่งต่อให้เจ้าหน้าที่",
     detailEn: "Deterministic lookup matched Zantara Meridian Trading Co. and refers it to an officer.",
     whyTh: "ใช้กฎตายตัวแทน AI เพื่อให้ผลเดิมทุกครั้งและตรวจสอบย้อนหลังได้",
+    whyEn: "Compliance screening must be repeatable and explainable. An exact rule-based lookup is safer here than a probabilistic AI answer.",
     confidence: 1
   },
   {
@@ -110,6 +115,7 @@ const panelDefaults: AnalysisPanel[] = [
     detailTh: "คะแนนความพร้อม 42 จาก 100 ปัจจัยหลักคือเอกสาร 8/10 และแนวโน้มการชำระเงินที่แย่ลง",
     detailEn: "Readiness is 42/100. Main factors include 8/10 completeness and worsening payment aging.",
     whyTh: "ช่วยจัดลำดับการตรวจ ไม่ได้ตัดสินอนุมัติแทนเจ้าหน้าที่",
+    whyEn: "A readiness score helps officers prioritize attention across many cases while exposing the factors behind the estimate.",
     confidence: 1
   },
   {
@@ -122,6 +128,7 @@ const panelDefaults: AnalysisPanel[] = [
     detailTh: "ร่างภาษาไทยระบุชัดว่ายังยืนยันกำหนดยื่นไม่ได้ และต้องขอ 03_bill_of_lading.pdf ใหม่",
     detailEn: "The Thai draft states that the filing deadline is unverified and 03_bill_of_lading.pdf must be requested again.",
     whyTh: "โมเดลเขียนจากผลตรวจหกขั้นก่อนหน้าเท่านั้น และต้องคงคำเตือนเรื่องข้อมูลที่ยังไม่ยืนยัน",
+    whyEn: "The final evidence is structured but not easy to read. Generative AI converts only the approved panel results into a concise officer draft.",
     confidence: 1,
     citationPage: 2
   }
@@ -137,6 +144,7 @@ type AnalysisPanel = {
   detailTh: string;
   detailEn: string;
   whyTh: string;
+  whyEn: string;
   confidence: number;
   citationPage?: number;
   rawData?: Record<string, unknown>;
@@ -622,7 +630,10 @@ function AiJourneyVisualizer({ panels }: { panels: AnalysisPanel[] }) {
           <p>{stage.detailTh}</p>
         </article>
       </div>
-      <div className="journey-caption"><ShieldCheck size={18} /><span><strong>สิ่งที่ต้องอธิบายกับผู้ชม:</strong> {stage.whyTh}</span></div>
+      <div className="journey-caption">
+        <ShieldCheck size={18} />
+        <span><strong>WHY THIS STEP IS NEEDED</strong><b>{stage.whyEn}</b><small>{stage.whyTh}</small></span>
+      </div>
     </section>
   );
 }
@@ -672,7 +683,7 @@ function AnalysisCard({ panel, index }: { panel: AnalysisPanel; index: number })
           <p lang="th">{panel.detailTh}</p>
           <small lang="en">{panel.detailEn}</small>
         </div>
-        <div className="why-it-matters"><strong>เหตุใดจึงสำคัญ</strong><p>{panel.whyTh}</p></div>
+        <div className="why-it-matters"><strong>WHY THIS STEP IS NEEDED</strong><p>{panel.whyEn}</p><small>{panel.whyTh}</small></div>
         {panel.citationPage && <a className="citation-chip important-citation" href={`/documents/08_policy.pdf#page=${panel.citationPage}`} target="_blank" rel="noreferrer"><FileText size={14} /> เปิดหลักฐาน · 08_policy.pdf · ข้อ 7.3 · หน้า {panel.citationPage}</a>}
         <button className="inspector-toggle" onClick={() => setOpen((current) => !current)} aria-expanded={open}>
           <Sparkles size={15} />
