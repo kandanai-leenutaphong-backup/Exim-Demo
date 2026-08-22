@@ -1,0 +1,17 @@
+FICTIONAL DEMONSTRATION CORRESPONDENCE
+Case: ECI-2026-000125
+From: Accounts Payable, Zantara Meridian Trading Co.
+To: Credit Control, Example Crest Industries Ltd.
+Date: 2026-07-28
+
+เรียนทีมงาน Example Crest,
+
+เราได้รับเอกสารสำหรับใบแจ้งหนี้ ECI-INV-260210-125 แล้ว แต่การจัดส่งล่าช้ากว่ากำหนด
+และทำให้กระบวนการรับสินค้าและอนุมัติการชำระเงินของเราล่าช้าไปด้วย
+
+We cite the shipping delay as the reason payment has not yet been released.
+This message is not a formal dispute of the invoice, goods, quantity, or amount.
+We are reviewing the payment schedule and will provide an update.
+
+ขอแสดงความนับถือ
+Fictional Accounts Payable Team

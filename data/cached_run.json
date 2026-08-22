@@ -1,0 +1,256 @@
+{
+  "schema_version": "1.0",
+  "case_id": "ECI-2026-000125",
+  "generated_at": "2026-08-22T03:30:17Z",
+  "panels": [
+    {
+      "panel": "classification",
+      "status": "complete",
+      "timestamp": "2026-08-22T03:30:17Z",
+      "data": {
+        "documents": [
+          {
+            "file": "01_claim_form.pdf",
+            "type": "claim_form",
+            "confidence": 0.99
+          },
+          {
+            "file": "02_commercial_invoice.pdf",
+            "type": "commercial_invoice",
+            "confidence": 0.99
+          },
+          {
+            "file": "03_bill_of_lading.pdf",
+            "type": "bill_of_lading",
+            "confidence": 0.91
+          },
+          {
+            "file": "04_packing_list.pdf",
+            "type": "packing_list",
+            "confidence": 0.98
+          },
+          {
+            "file": "05_export_declaration.pdf",
+            "type": "export_declaration",
+            "confidence": 0.93
+          },
+          {
+            "file": "06_correspondence.txt",
+            "type": "correspondence",
+            "confidence": 0.99
+          },
+          {
+            "file": "07_payment_history.xlsx",
+            "type": "payment_history",
+            "confidence": 0.99
+          },
+          {
+            "file": "08_policy.pdf",
+            "type": "policy",
+            "confidence": 0.99
+          }
+        ],
+        "completeness": {
+          "present": 8,
+          "required": 10,
+          "ratio": 0.8,
+          "missing": [
+            "power_of_attorney",
+            "proof_of_delivery"
+          ]
+        }
+      }
+    },
+    {
+      "panel": "extraction",
+      "status": "warning",
+      "timestamp": "2026-08-22T03:30:17Z",
+      "data": {
+        "documents": [
+          {
+            "file": "01_claim_form.pdf",
+            "fields": [
+              {
+                "name": "claim_date",
+                "value": "2026-08-08",
+                "confidence": 0.99
+              },
+              {
+                "name": "policy_number",
+                "value": "ECI-2026-000125",
+                "confidence": 0.99
+              },
+              {
+                "name": "buyer",
+                "value": "Zantara Meridian Trading Co.",
+                "confidence": 0.98
+              }
+            ]
+          },
+          {
+            "file": "02_commercial_invoice.pdf",
+            "fields": [
+              {
+                "name": "invoice_date",
+                "value": "2026-02-10",
+                "confidence": 0.98
+              },
+              {
+                "name": "invoice_amount",
+                "value": "USD 225,000.00",
+                "confidence": 0.99
+              }
+            ]
+          },
+          {
+            "file": "03_bill_of_lading.pdf",
+            "fields": [
+              {
+                "name": "shipment_date",
+                "value": "2026-02-12",
+                "confidence": 0.54
+              },
+              {
+                "name": "declared_cargo_value",
+                "value": "USD 225,000.00",
+                "confidence": 0.93
+              }
+            ]
+          },
+          {
+            "file": "05_export_declaration.pdf",
+            "fields": [
+              {
+                "name": "destination_port",
+                "value": "Port of Zantara",
+                "confidence": 0.91
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "panel": "language",
+      "status": "complete",
+      "timestamp": "2026-08-22T03:30:17Z",
+      "data": {
+        "detected_languages": [
+          {
+            "language": "Thai",
+            "iso6391": "th",
+            "confidence": 0.99
+          },
+          {
+            "language": "English",
+            "iso6391": "en",
+            "confidence": 0.99
+          }
+        ],
+        "entities": [
+          {
+            "text": "Zantara Meridian Trading Co.",
+            "category": "Organization"
+          },
+          {
+            "text": "shipping delay",
+            "category": "Event"
+          }
+        ],
+        "formal_dispute": false,
+        "summary_en": "Buyer cites a shipping delay; no formal dispute is present.",
+        "summary_th": "ผู้ซื้ออ้างถึงความล่าช้าในการขนส่ง และไม่พบข้อพิพาทอย่างเป็นทางการ"
+      }
+    },
+    {
+      "panel": "policy",
+      "status": "warning",
+      "timestamp": "2026-08-22T03:30:17Z",
+      "data": {
+        "answer": "The policy requires filing within 180 calendar days of shipment, but this case cannot be evaluated because the shipment date is unverified.",
+        "citation": {
+          "label": "Clause 7.3, page 2",
+          "clause": "7.3",
+          "page": 2,
+          "file": "08_policy.pdf"
+        },
+        "filing_window": {
+          "days": 180,
+          "status": "unverified",
+          "deadline": null,
+          "source_field": "shipment_date",
+          "source_file": "03_bill_of_lading.pdf",
+          "reason": "shipment_date confidence 0.54 is below the 0.60 confidence gate"
+        }
+      }
+    },
+    {
+      "panel": "screening",
+      "status": "warning",
+      "timestamp": "2026-08-22T03:30:17Z",
+      "data": {
+        "result": "refer",
+        "counterparty": "Zantara Meridian Trading Co.",
+        "matched_entry": {
+          "entry_id": "ILL-ZAN-001",
+          "entity_name": "Zantara Meridian Trading Co.",
+          "country": "Republic of Zantara"
+        },
+        "list_label": "ILLUSTRATIVE — NOT AN OFFICIAL SANCTIONS LIST",
+        "list_version": "2026.08-demo",
+        "checked_at": "2026-08-22T03:30:17Z",
+        "method": "deterministic exact-name lookup",
+        "uses_llm": false
+      }
+    },
+    {
+      "panel": "score",
+      "status": "complete",
+      "timestamp": "2026-08-22T03:30:17Z",
+      "data": {
+        "score": 42,
+        "scale": 100,
+        "disposition": "manual_review",
+        "top_factors": [
+          {
+            "factor": "Document completeness",
+            "value": "8/10",
+            "impact": "negative"
+          },
+          {
+            "factor": "Payment aging trend",
+            "value": "worsening final six months",
+            "impact": "negative"
+          },
+          {
+            "factor": "Prior claim count",
+            "value": 1,
+            "impact": "neutral"
+          }
+        ],
+        "unverified_inputs": [
+          "shipment_date from 03_bill_of_lading.pdf"
+        ]
+      }
+    },
+    {
+      "panel": "report",
+      "status": "complete",
+      "timestamp": "2026-08-22T03:30:17Z",
+      "data": {
+        "language": "th",
+        "paragraph_count": 3,
+        "thai_report": "คำขอเคลมกรณี ECI-2026-000125 มีเอกสารครบ 8 จาก 10 รายการ ยอดตามใบแจ้งหนี้คือ USD 225,000.00 และผู้ซื้อระบุว่าการชำระเงินล่าช้าเพราะการขนส่งล่าช้า โดยไม่มีข้อพิพาทอย่างเป็นทางการ\n\nวันที่จัดส่งที่อ่านจาก 03_bill_of_lading.pdf คือ 2026-02-12 แต่ค่าความเชื่อมั่นต่ำกว่าเกณฑ์ 0.60 ดังนั้นกำหนดยื่นภายใน 180 วันตาม Policy ECI-2026-000125, Clause 7.3, page 2 ยังไม่ได้รับการยืนยันและไม่มีการคำนวณวันครบกำหนด\n\nผลคัดกรองแบบกำหนดตายตัวพบรายการที่ตรงกับ Zantara Meridian Trading Co. ในบัญชีตัวอย่าง และคะแนนเคสคือ 42 จาก 100 ข้อมูลทั้งหมดเป็นข้อมูลสังเคราะห์สำหรับการสาธิต",
+        "input_panels": [
+          "classification",
+          "extraction",
+          "language",
+          "policy",
+          "screening",
+          "score"
+        ],
+        "grounding_rule": "No facts outside panel results 1-6."
+      }
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "label": "ILLUSTRATIVE — NOT AN OFFICIAL SANCTIONS LIST",
+  "version": "2026.08-demo",
+  "generated_for": "ClaimPilot synthetic demonstration",
+  "entries": [
+    {
+      "entry_id": "ILL-ZAN-001",
+      "entity_name": "Zantara Meridian Trading Co.",
+      "aliases": [
+        "Zantara Meridian Trading"
+      ],
+      "country": "Republic of Zantara",
+      "program": "Fictional Zantara Trade Review"
+    },
+    {
+      "entry_id": "ILL-NOV-002",
+      "entity_name": "Novara Harbor Components Cooperative",
+      "aliases": [],
+      "country": "Federation of Novara",
+      "program": "Fictional Novara Demonstration Program"
+    }
+  ]
+}
