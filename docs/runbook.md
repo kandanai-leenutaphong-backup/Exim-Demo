@@ -148,14 +148,23 @@ the evidence inspectable.
 
 ## 4:05 to 4:35, quickly explain the remaining stages
 
-**Point to each card without opening all of them:**
+**Open each card and point to its visual input and output:**
 
-- **Vision:** Identifies document types and missing evidence.
-- **Language:** Understands Thai and English correspondence.
-- **Rule-based screening:** Produces a repeatable compliance result without an
-  LLM.
-- **Machine learning:** Estimates readiness and shows contributing factors.
-- **Generative AI:** Drafts Thai text only from the six prior panel results.
+- **Vision:** The left side shows real document thumbnails. The right side shows
+  eight classified files, two missing files, and the `8 / 10` completeness
+  value passed onward.
+- **Language:** The left side highlights the exact Thai and English phrases in
+  the correspondence. The right side shows detected languages, organization,
+  event, and `formal dispute: No`.
+- **Rule-based screening:** The left side shows the illustrative list and the
+  highlighted matched row. The right side shows the exact buyer-name
+  comparison and `REFER` result.
+- **Machine learning:** The left side shows the four case features as labeled
+  bars. The right side shows the `42 / 100` readiness output and manual-review
+  disposition.
+- **Generative AI:** The left side shows the six panel results allowed into the
+  prompt. The right side shows the Thai draft and highlights the required
+  unverified statement.
 
 **Say:**
 

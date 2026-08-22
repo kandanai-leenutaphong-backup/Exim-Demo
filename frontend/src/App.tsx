@@ -561,7 +561,7 @@ function AnalysisCard({ panel, index }: { panel: AnalysisPanel; index: number })
   const confidence = Math.round(panel.confidence * 100);
   const showsConfidence = ["VISION", "OCR", "NLP"].includes(panel.type);
   const isFocus = panel.type === "OCR" || panel.type === "FOUNDRY IQ PATTERN";
-  const [open, setOpen] = useState(isFocus);
+  const [open, setOpen] = useState(true);
   const [showJson, setShowJson] = useState(false);
   return (
     <article className={`analysis-card ${low ? "low-confidence" : ""} ${isFocus ? "capability-focus" : ""}`}>
@@ -606,7 +606,7 @@ function AnalysisCard({ panel, index }: { panel: AnalysisPanel; index: number })
                 <div><small>OUTPUT · ผลที่ส่งต่อ</small><strong>{panel.detailTh}</strong></div>
               </article>
             </div>
-            {(panel.type === "OCR" || panel.type === "FOUNDRY IQ PATTERN") && <DocumentVisual type={panel.type} />}
+            <StepVisual panel={panel} />
             <div className="inspector-guardrail">
               <ShieldCheck size={17} />
               <span><strong>การควบคุม:</strong> {low ? "ผลต่ำกว่า 60% ถูกทำเครื่องหมายว่ายังไม่ยืนยัน และห้ามนำไปคำนวณต่อ" : "ผลลัพธ์ถูกบันทึกพร้อมเวลา ผู้ใช้งาน และแหล่งข้อมูลเพื่อการตรวจสอบย้อนหลัง"}</span>
@@ -619,6 +619,115 @@ function AnalysisCard({ panel, index }: { panel: AnalysisPanel; index: number })
         )}
       </div>
     </article>
+  );
+}
+
+function StepVisual({ panel }: { panel: AnalysisPanel }) {
+  if (panel.type === "OCR" || panel.type === "FOUNDRY IQ PATTERN") {
+    return <DocumentVisual type={panel.type} />;
+  }
+  if (panel.type === "VISION") {
+    return (
+      <div className="step-visual classification-visual">
+        <div className="visual-source">
+          <p className="kicker">VISUAL INPUT · DOCUMENT PAGES</p>
+          <div className="thumbnail-grid">
+            {[
+              ["01_claim_form.pdf", "Claim form"],
+              ["02_commercial_invoice.pdf", "Invoice"],
+              ["03_bill_of_lading.pdf", "Bill of lading"],
+              ["05_export_declaration.pdf", "Export declaration"]
+            ].map(([file, label]) => <figure key={file}><img src={`/documents/${file}/preview?page=1`} alt={label} loading="lazy" /><figcaption>{label}<small>{file}</small></figcaption></figure>)}
+          </div>
+        </div>
+        <div className="visual-output">
+          <p className="kicker">VISION OUTPUT</p>
+          <div className="output-list">
+            <span><CheckCircle2 size={15} /><strong>8 files classified</strong><small>Claim form, invoice, B/L, policy...</small></span>
+            <span><AlertTriangle size={15} /><strong>2 files missing</strong><small>Power of Attorney · Proof of Delivery</small></span>
+            <span><FileCheck2 size={15} /><strong>Completeness 8 / 10</strong><small>Passed to readiness scoring</small></span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+  if (panel.type === "NLP") {
+    return (
+      <div className="step-visual language-visual">
+        <div className="visual-source correspondence-page">
+          <p className="kicker">TEXT INPUT · 06_correspondence.txt</p>
+          <div className="email-header"><strong>From: Zantara Meridian Trading Co.</strong><small>Thai + English correspondence</small></div>
+          <p>เราได้รับเอกสารแล้ว แต่<span className="text-highlight">การจัดส่งล่าช้ากว่ากำหนด</span></p>
+          <p>We cite the <span className="text-highlight">shipping delay</span> as the reason payment has not yet been released.</p>
+          <p>This message is <span className="text-highlight safe">not a formal dispute</span> of the invoice.</p>
+        </div>
+        <div className="visual-output">
+          <p className="kicker">LANGUAGE OUTPUT</p>
+          <div className="label-stack">
+            <span><small>LANGUAGES</small><strong>Thai 99% · English 99%</strong></span>
+            <span><small>ENTITY</small><strong>Zantara Meridian Trading Co.</strong></span>
+            <span><small>EVENT</small><strong>Shipping delay</strong></span>
+            <span className="safe-output"><small>FORMAL DISPUTE</small><strong>No</strong></span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+  if (panel.type === "RULE-BASED") {
+    return (
+      <div className="step-visual screening-visual">
+        <div className="visual-source list-page">
+          <p className="kicker">LIST INPUT · sanctions.json</p>
+          <div className="list-label">ILLUSTRATIVE · NOT AN OFFICIAL SANCTIONS LIST</div>
+          <div className="list-row matched"><span>ILL-ZAN-001</span><strong>Zantara Meridian Trading Co.</strong><small>Republic of Zantara</small></div>
+          <div className="list-row"><span>ILL-NOV-002</span><strong>Novara Harbor Components Cooperative</strong><small>Federation of Novara</small></div>
+        </div>
+        <div className="visual-output">
+          <p className="kicker">DETERMINISTIC OUTPUT</p>
+          <div className="match-comparison"><span>Buyer name</span><strong>Zantara Meridian Trading Co.</strong><i>= EXACT MATCH</i></div>
+          <div className="visual-decision warning"><AlertTriangle size={17} /><span><strong>Result: REFER</strong> Same input always returns the same matched entry.</span></div>
+        </div>
+      </div>
+    );
+  }
+  if (panel.type === "MACHINE LEARNING") {
+    return (
+      <div className="step-visual score-visual">
+        <div className="visual-source">
+          <p className="kicker">MODEL INPUT · CASE FEATURES</p>
+          <div className="feature-bars">
+            <span><small>Documents</small><i><b style={{ width: "80%" }} /></i><strong>8 / 10</strong></span>
+            <span><small>Payment aging</small><i><b style={{ width: "72%" }} /></i><strong>Worsening</strong></span>
+            <span><small>Shipment confidence</small><i><b className="warning-bar" style={{ width: "54%" }} /></i><strong>54%</strong></span>
+            <span><small>Prior claims</small><i><b style={{ width: "20%" }} /></i><strong>1</strong></span>
+          </div>
+          <p className="visual-note">Compared with 200 generated historical claims</p>
+        </div>
+        <div className="visual-output centered-output">
+          <p className="kicker">MODEL OUTPUT</p>
+          <div className="mini-score"><strong>42</strong><small>/ 100 readiness</small></div>
+          <span className="status pending">MANUAL REVIEW</span>
+          <p>Top factors are shown so the score is not a black box.</p>
+        </div>
+      </div>
+    );
+  }
+  return (
+    <div className="step-visual report-visual">
+      <div className="visual-source">
+        <p className="kicker">MODEL INPUT · PANELS 1–6 ONLY</p>
+        <div className="panel-inputs">
+          {["8/10 documents", "Shipment date 54%", "No formal dispute", "Clause 7.3", "Screening: refer", "Score: 42"].map((item, index) => <span key={item}><b>{index + 1}</b>{item}</span>)}
+        </div>
+        <div className="prompt-rule"><ShieldCheck size={16} /><span>ห้ามเพิ่มข้อเท็จจริงหรือตัวเลขที่ไม่มีในผลตรวจ</span></div>
+      </div>
+      <div className="visual-output report-page">
+        <p className="kicker">GENERATED OUTPUT · THAI DRAFT</p>
+        <p>คำขอเคลมมีเอกสารครบ 8 จาก 10 รายการ...</p>
+        <p className="report-highlight">กำหนดยื่นภายใน 180 วันยังไม่ได้รับการยืนยัน และต้องขอ 03_bill_of_lading.pdf ใหม่</p>
+        <small>Three paragraphs · grounded only in inspected results</small>
+      </div>
+    </div>
   );
 }
 
