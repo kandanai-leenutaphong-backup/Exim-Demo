@@ -29,69 +29,83 @@ const DEMO_MODE = import.meta.env.VITE_DEMO_MODE === "cached";
 const DEMO_REPORT = "คำขอเคลมกรณี ECI-2026-000125 มีเอกสารครบ 8 จาก 10 รายการ ยอดตามใบแจ้งหนี้คือ USD 225,000.00 และผู้ซื้อระบุว่าการชำระเงินล่าช้าเพราะการขนส่งล่าช้า โดยไม่มีข้อพิพาทอย่างเป็นทางการ\n\nวันที่จัดส่งที่อ่านจาก 03_bill_of_lading.pdf คือ 2026-02-12 แต่ค่าความเชื่อมั่นต่ำกว่าเกณฑ์ 0.60 ดังนั้นกำหนดยื่นภายใน 180 วันตาม Policy ECI-2026-000125, Clause 7.3, page 2 ยังไม่ได้รับการยืนยันและไม่มีการคำนวณวันครบกำหนด\n\nผลคัดกรองแบบกำหนดตายตัวพบรายการที่ตรงกับ Zantara Meridian Trading Co. ในบัญชีตัวอย่าง และคะแนนเคสคือ 42 จาก 100 ข้อมูลทั้งหมดเป็นข้อมูลสังเคราะห์สำหรับการสาธิต";
 
 const wizardSteps = [
-  "ข้อมูลกรมธรรม์",
-  "Sanctioned countries",
-  "ผลการตรวจ",
-  "AI consultant",
-  "สรุป"
+  "เอกสาร",
+  "ตรวจคู่ค้า",
+  "AI ตรวจเคส",
+  "คำแนะนำ",
+  "ตัดสินใจ"
 ] as const;
 
 const panelDefaults: AnalysisPanel[] = [
   {
     type: "VISION",
+    service: "Azure AI Vision",
     titleTh: "ตรวจสอบคุณภาพและประเภทเอกสาร",
     titleEn: "Document quality & classification",
     detailTh: "พบเอกสาร 8 จาก 10 รายการ โดยขาดหนังสือมอบอำนาจและหลักฐานการส่งมอบ",
     detailEn: "Eight of ten required documents are present. Power of Attorney and Proof of Delivery are missing.",
+    whyTh: "ช่วยให้เจ้าหน้าที่เห็นทันทีว่าเอกสารใดขาด ก่อนเริ่มพิจารณา",
     confidence: 0.91
   },
   {
     type: "OCR",
+    service: "Azure AI Document Intelligence",
     titleTh: "สกัดข้อมูลจากเอกสาร",
     titleEn: "Document data extraction",
     detailTh: "วันที่ส่งสินค้า 2026-02-12 จาก 03_bill_of_lading.pdf มีความเชื่อมั่นเพียง 54% และต้องตรวจสอบใหม่",
     detailEn: "Shipment date 2026-02-12 from 03_bill_of_lading.pdf is only 54% confident and must be rechecked.",
+    whyTh: "ระบบอ่านเอกสารสแกนพร้อมบอกความมั่นใจ จึงไม่ส่งวันที่ที่ไม่น่าเชื่อถือไปคำนวณต่อ",
     confidence: 0.54
   },
   {
     type: "NLP",
+    service: "Azure AI Language",
     titleTh: "ทำความเข้าใจเหตุการณ์เรียกร้อง",
     titleEn: "Claim narrative understanding",
     detailTh: "ผู้ซื้ออ้างถึงความล่าช้าในการขนส่ง และไม่พบข้อพิพาทอย่างเป็นทางการ",
     detailEn: "Buyer cites a shipping delay; no formal dispute is present.",
+    whyTh: "สรุปอีเมลภาษาไทยและอังกฤษให้เป็นประเด็นที่ตรวจสอบได้",
     confidence: 0.99
   },
   {
-    type: "GROUNDED RETRIEVAL",
-    titleTh: "ค้นหาข้อกำหนดกรมธรรม์ที่เกี่ยวข้อง",
-    titleEn: "Relevant policy retrieval",
+    type: "FOUNDRY IQ PATTERN",
+    service: "Foundry IQ grounding via Azure AI Search",
+    titleTh: "ค้นหาคำตอบจากกรมธรรม์พร้อมหลักฐาน",
+    titleEn: "Ground the answer in the policy",
     detailTh: "ข้อ 7.3 กำหนดกรอบ 180 วัน แต่ยังยืนยันผลไม่ได้เพราะวันที่ส่งสินค้ามีความเชื่อมั่นต่ำ",
     detailEn: "Clause 7.3 sets a 180-day window, but the result cannot be confirmed because the shipment date is low confidence.",
+    whyTh: "คำตอบเชื่อมกลับไปยังข้อ 7.3 หน้า 2 เจ้าหน้าที่จึงเปิดตรวจหลักฐานต้นทางได้",
     confidence: 1,
     citationPage: 2
   },
   {
     type: "RULE-BASED",
+    service: "Deterministic local list",
     titleTh: "ตรวจสอบเงื่อนไขบังคับ",
     titleEn: "Mandatory condition checks",
     detailTh: "การค้นหาแบบกำหนดตายตัวพบรายการ Zantara Meridian Trading Co. และส่งต่อให้เจ้าหน้าที่",
     detailEn: "Deterministic lookup matched Zantara Meridian Trading Co. and refers it to an officer.",
+    whyTh: "ใช้กฎตายตัวแทน AI เพื่อให้ผลเดิมทุกครั้งและตรวจสอบย้อนหลังได้",
     confidence: 1
   },
   {
     type: "MACHINE LEARNING",
+    service: "scikit-learn",
     titleTh: "ประเมินความพร้อมของเคส",
     titleEn: "Case readiness estimate",
     detailTh: "คะแนนความพร้อม 42 จาก 100 ปัจจัยหลักคือเอกสาร 8/10 และแนวโน้มการชำระเงินที่แย่ลง",
     detailEn: "Readiness is 42/100. Main factors include 8/10 completeness and worsening payment aging.",
+    whyTh: "ช่วยจัดลำดับการตรวจ ไม่ได้ตัดสินอนุมัติแทนเจ้าหน้าที่",
     confidence: 1
   },
   {
     type: "GENERATIVE AI",
+    service: "Microsoft Foundry model",
     titleTh: "จัดทำข้อเสนอแนะเพื่อการพิจารณา",
     titleEn: "Review recommendation drafting",
     detailTh: "ร่างภาษาไทยระบุชัดว่ายังยืนยันกำหนดยื่นไม่ได้ และต้องขอ 03_bill_of_lading.pdf ใหม่",
     detailEn: "The Thai draft states that the filing deadline is unverified and 03_bill_of_lading.pdf must be requested again.",
+    whyTh: "โมเดลเขียนจากผลตรวจหกขั้นก่อนหน้าเท่านั้น และต้องคงคำเตือนเรื่องข้อมูลที่ยังไม่ยืนยัน",
     confidence: 1,
     citationPage: 2
   }
@@ -99,10 +113,12 @@ const panelDefaults: AnalysisPanel[] = [
 
 type AnalysisPanel = {
   type: string;
+  service: string;
   titleTh: string;
   titleEn: string;
   detailTh: string;
   detailEn: string;
+  whyTh: string;
   confidence: number;
   citationPage?: number;
 };
@@ -471,15 +487,42 @@ function Analysis({
   return (
     <section>
       <div className="section-heading">
-        <div><p className="kicker">STEP 03 · EVIDENCE ANALYSIS</p><h2>ผลการตรวจ</h2><p>Results arrive in a controlled, ordered sequence.</p></div>
+        <div><p className="kicker">STEP 03 · EVIDENCE ANALYSIS</p><h2>AI ช่วยตรวจอะไรบ้าง?</h2><p>อ่านเอกสาร → ค้นหากฎ → แสดงสิ่งที่ต้องให้เจ้าหน้าที่ตัดสินใจ</p></div>
         <span className={`status ${analyzing ? "processing" : "success"}`}>{analyzing ? <><LoaderCircle className="spin" size={14} />กำลังวิเคราะห์</> : "วิเคราะห์ครบแล้ว"}</span>
+      </div>
+      <div className="capability-guide">
+        <div className="capability-guide-title">
+          <p className="kicker">TWO CAPABILITIES TO WATCH</p>
+          <h3>สองความสามารถสำคัญในเดโมนี้</h3>
+          <p>ทั้งสองบริการทำงานต่อกัน แต่มีหน้าที่ต่างกันอย่างชัดเจน</p>
+        </div>
+        <article>
+          <span className="capability-step">1</span>
+          <div>
+            <strong>Document Intelligence อ่านเอกสาร</strong>
+            <p>ดึงวันที่ จำนวนเงิน และเลขกรมธรรม์จาก PDF พร้อมค่าความมั่นใจ</p>
+            <small>เห็นชัดในผลตรวจหมายเลข 02</small>
+          </div>
+        </article>
+        <article>
+          <span className="capability-step">2</span>
+          <div>
+            <strong>Foundry IQ pattern ค้นหากฎที่เกี่ยวข้อง</strong>
+            <p>ค้นข้อกำหนดจากกรมธรรม์ แล้วตอบพร้อมข้อและเลขหน้าเพื่อเปิดตรวจได้</p>
+            <small>เดโมนี้ใช้ Azure AI Search เป็น grounding fallback · ดูผลตรวจหมายเลข 04</small>
+          </div>
+        </article>
+        <div className="capability-bridge">
+          <ShieldCheck size={18} />
+          <p><strong>จุดสำคัญ:</strong> เมื่อ Document Intelligence ไม่มั่นใจในวันที่ ระบบจะไม่ให้ Foundry IQ สรุปว่าเคสผ่านเงื่อนไข 180 วัน</p>
+        </div>
       </div>
       <div className="analysis-layout">
         <aside className="analysis-progress">
           <strong>{panels.length}<small>/ 7</small></strong>
-          <span>analysis stages</span>
+          <span>ขั้นตอนที่ตรวจแล้ว</span>
           <div className="progress-track"><i style={{ width: `${(panels.length / 7) * 100}%` }} /></div>
-          <p>แต่ละผลลัพธ์เป็นข้อมูลช่วยพิจารณา ไม่ใช่ข้อสรุปแทนเจ้าหน้าที่</p>
+          <p>อ่านจากบนลงล่าง แต่ละบัตรบอกว่าใช้บริการอะไร พบอะไร และเหตุใดจึงสำคัญ</p>
         </aside>
         <div className="panels">
           {panels.map((panel, index) => <AnalysisCard key={`${panel.type}-${index}`} panel={panel} index={index} />)}
@@ -497,17 +540,28 @@ function Analysis({
 function AnalysisCard({ panel, index }: { panel: AnalysisPanel; index: number }) {
   const low = panel.confidence < 0.6;
   const confidence = Math.round(panel.confidence * 100);
+  const showsConfidence = ["VISION", "OCR", "NLP"].includes(panel.type);
+  const isFocus = panel.type === "OCR" || panel.type === "FOUNDRY IQ PATTERN";
   return (
-    <article className={`analysis-card ${low ? "low-confidence" : ""}`}>
+    <article className={`analysis-card ${low ? "low-confidence" : ""} ${isFocus ? "capability-focus" : ""}`}>
       <div className="panel-number">{String(index + 1).padStart(2, "0")}</div>
       <div className="panel-content">
         <div className="panel-top">
-          <div><span className="ai-type">{panel.type}</span><h3>{panel.titleTh}<small>{panel.titleEn}</small></h3></div>
-          <div className={`confidence ${low ? "warning" : ""}`}><span>{low && <AlertTriangle size={14} />} ความเชื่อมั่น / Confidence</span><strong>{confidence}%</strong></div>
+          <div>
+            <span className="ai-type">{panel.type}</span>
+            <span className="service-name">{panel.service}</span>
+            <h3>{panel.titleTh}<small>{panel.titleEn}</small></h3>
+          </div>
+          {showsConfidence && <div className={`confidence ${low ? "warning" : ""}`}><span>{low && <AlertTriangle size={14} />} ความเชื่อมั่น / Confidence</span><strong>{confidence}%</strong></div>}
         </div>
-        {low && <div className="confidence-warning"><AlertTriangle size={16} /><span><strong>ความเชื่อมั่นต่ำ</strong> ควรตรวจสอบข้อมูลต้นฉบับก่อนนำไปใช้ · Low confidence, verify against the source document.</span></div>}
-        <div className="bilingual"><p lang="th">{panel.detailTh}</p><p lang="en">{panel.detailEn}</p></div>
-        {panel.citationPage && <a className="citation-chip" href={`/documents/08_policy.pdf#page=${panel.citationPage}`} target="_blank" rel="noreferrer"><FileText size={14} /> 08_policy.pdf · หน้า {panel.citationPage}</a>}
+        {low && <div className="confidence-warning"><AlertTriangle size={16} /><span><strong>หยุดการคำนวณจากข้อมูลนี้</strong> วันที่ยังไม่ผ่านเกณฑ์ 60% จึงต้องตรวจเอกสารต้นฉบับก่อน</span></div>}
+        <div className="plain-result">
+          <span>ผลที่พบ</span>
+          <p lang="th">{panel.detailTh}</p>
+          <small lang="en">{panel.detailEn}</small>
+        </div>
+        <div className="why-it-matters"><strong>เหตุใดจึงสำคัญ</strong><p>{panel.whyTh}</p></div>
+        {panel.citationPage && <a className="citation-chip important-citation" href={`/documents/08_policy.pdf#page=${panel.citationPage}`} target="_blank" rel="noreferrer"><FileText size={14} /> เปิดหลักฐาน · 08_policy.pdf · ข้อ 7.3 · หน้า {panel.citationPage}</a>}
       </div>
     </article>
   );

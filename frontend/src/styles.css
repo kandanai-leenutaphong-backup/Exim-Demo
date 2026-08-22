@@ -969,6 +969,96 @@ td small {
   color: var(--cp-text-muted);
 }
 
+.capability-guide {
+  display: grid;
+  margin-bottom: 24px;
+  padding: 22px;
+  grid-template-columns: 1.05fr 1fr 1fr;
+  gap: 16px;
+  border: 1px solid var(--cp-border);
+  border-radius: 16px;
+  background: var(--cp-surface);
+}
+
+.capability-guide-title h3,
+.capability-guide-title p,
+.capability-guide article p,
+.capability-guide article small,
+.capability-bridge p {
+  margin: 0;
+}
+
+.capability-guide-title h3 {
+  font-size: 19px;
+}
+
+.capability-guide-title > p:last-child {
+  margin-top: 7px;
+  color: var(--cp-text-muted);
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.capability-guide article {
+  display: flex;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid var(--cp-border);
+  border-radius: 10px;
+  background: var(--cp-bg-elevated);
+}
+
+.capability-step {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  flex: 0 0 28px;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--cp-accent);
+  color: var(--cp-accent-fg);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.capability-guide article strong {
+  font-size: 13px;
+}
+
+.capability-guide article p {
+  margin-top: 6px;
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.capability-guide article small {
+  display: block;
+  margin-top: 8px;
+  color: var(--cp-text-muted);
+  font-size: 10px;
+  line-height: 1.45;
+}
+
+.capability-bridge {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  grid-column: 1 / -1;
+  border-left: 3px solid var(--cp-accent);
+  background: var(--cp-accent-soft);
+}
+
+.capability-bridge svg {
+  flex: 0 0 auto;
+  color: var(--cp-accent);
+}
+
+.capability-bridge p {
+  font-size: 12px;
+  line-height: 1.55;
+}
+
 .analysis-layout {
   display: grid;
   align-items: start;
@@ -1044,6 +1134,10 @@ td small {
   border-color: var(--cp-warning);
 }
 
+.analysis-card.capability-focus {
+  border-width: 2px;
+}
+
 .panel-number {
   display: grid;
   place-items: start center;
@@ -1072,6 +1166,19 @@ td small {
   font-size: 9px;
   font-weight: 800;
   letter-spacing: 0.16em;
+}
+
+.service-name {
+  display: block;
+  width: fit-content;
+  margin-top: 6px;
+  padding: 3px 7px;
+  border: 1px solid var(--cp-border);
+  border-radius: 10px;
+  background: var(--cp-surface-soft);
+  color: var(--cp-text-muted);
+  font-size: 10px;
+  font-weight: 650;
 }
 
 .panel-top h3 {
@@ -1130,6 +1237,47 @@ td small {
   color: var(--cp-warning);
 }
 
+.plain-result {
+  margin-top: 16px;
+}
+
+.plain-result > span,
+.why-it-matters strong {
+  color: var(--cp-text-muted);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.plain-result p {
+  margin: 6px 0 0;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.65;
+}
+
+.plain-result small {
+  display: block;
+  margin-top: 5px;
+  color: var(--cp-text-muted);
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+.why-it-matters {
+  margin-top: 14px;
+  padding: 12px 14px;
+  border-left: 3px solid var(--cp-border-strong);
+  background: var(--cp-surface-soft);
+}
+
+.why-it-matters p {
+  margin: 4px 0 0;
+  font-size: 12px;
+  line-height: 1.55;
+}
+
 .bilingual {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -1170,6 +1318,14 @@ td small {
 
 .citation-chip:hover {
   border-color: var(--cp-link);
+}
+
+.important-citation {
+  padding: 8px 11px;
+  border-color: var(--cp-link);
+  border-radius: 10px;
+  background: var(--cp-surface);
+  font-size: 11px;
 }
 
 .analysis-loading {
@@ -1507,6 +1663,14 @@ td small {
 
   .analysis-layout {
     grid-template-columns: 1fr;
+  }
+
+  .capability-guide {
+    grid-template-columns: 1fr;
+  }
+
+  .capability-bridge {
+    grid-column: 1;
   }
 
   .analysis-progress {
