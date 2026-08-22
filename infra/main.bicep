@@ -6,6 +6,12 @@ param environmentName string
 param location string
 @description('Object ID of the azd deployment principal for passwordless ACR push.')
 param principalId string
+@description('Dedicated delegated subnet resource ID for the ClaimPilot Container Apps environment.')
+param containerAppsSubnetId string
+@description('Existing private endpoint subnet resource ID in the spoke.')
+param privateEndpointsSubnetId string
+@description('Existing central Cosmos DB private DNS zone resource ID.')
+param cosmosPrivateDnsZoneId string
 @description('Existing single-tenant Entra application client ID. Set through azd env, never source control.')
 param entraClientId string
 @description('Microsoft Entra tenant ID.')
@@ -45,6 +51,9 @@ module resources 'resources.bicep' = {
     location: location
     suffix: suffix
     principalId: principalId
+    containerAppsSubnetId: containerAppsSubnetId
+    privateEndpointsSubnetId: privateEndpointsSubnetId
+    cosmosPrivateDnsZoneId: cosmosPrivateDnsZoneId
     entraClientId: entraClientId
     entraTenantId: entraTenantId
     foundryChatDeployment: foundryChatDeployment

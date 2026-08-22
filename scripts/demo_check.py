@@ -93,8 +93,7 @@ async def verify_live() -> None:
         )
         translator.raise_for_status()
         foundry = await http.get(
-            f"{required('FOUNDRY_ENDPOINT').rstrip('/')}/openai/models",
-            params={"api-version": "v1"},
+            f"{required('FOUNDRY_ENDPOINT').rstrip('/')}/openai/v1/models",
             headers={"Authorization": f"Bearer {translator_token.token}"},
         )
         foundry.raise_for_status()

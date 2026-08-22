@@ -13,7 +13,7 @@ class AuditStore:
     def __init__(self, settings: Settings, credential: Any) -> None:
         self._container = None
         self._memory: list[dict[str, Any]] = []
-        if settings.demo_mode != "cached" and settings.cosmos_endpoint:
+        if settings.cosmos_endpoint:
             client = CosmosClient(settings.cosmos_endpoint, credential=credential)
             database = client.get_database_client(settings.cosmos_database)
             self._container = database.get_container_client(settings.cosmos_container)
@@ -49,4 +49,3 @@ class AuditStore:
                 self._container.delete_item(item["id"], partition_key=item["case_id"])
         self._memory.clear()
         logger.info("Demo audit state reset at %s", datetime.now(UTC).isoformat())
-

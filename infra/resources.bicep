@@ -2,6 +2,9 @@ param environmentName string
 param location string
 param suffix string
 param principalId string
+param containerAppsSubnetId string
+param privateEndpointsSubnetId string
+param cosmosPrivateDnsZoneId string
 param entraClientId string
 param entraTenantId string
 param foundryChatDeployment string
@@ -154,6 +157,43 @@ resource audit 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers@20
   }
 }
 
+resource cosmosPrivateEndpoint 'Microsoft.Network/privateEndpoints@2024-05-01' = {
+  name: 'pe-cosmos-claimpilot-${suffix}'
+  location: location
+  tags: tags
+  properties: {
+    subnet: {
+      id: privateEndpointsSubnetId
+    }
+    privateLinkServiceConnections: [
+      {
+        name: 'cosmos-sql'
+        properties: {
+          privateLinkServiceId: cosmos.id
+          groupIds: [
+            'Sql'
+          ]
+        }
+      }
+    ]
+  }
+}
+
+resource cosmosDnsGroup 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2024-05-01' = {
+  parent: cosmosPrivateEndpoint
+  name: 'default'
+  properties: {
+    privateDnsZoneConfigs: [
+      {
+        name: 'cosmos'
+        properties: {
+          privateDnsZoneId: cosmosPrivateDnsZoneId
+        }
+      }
+    ]
+  }
+}
+
 resource vault 'Microsoft.KeyVault/vaults@2024-11-01' = {
   name: 'kv-claimpilot-${suffix}'
   location: location
@@ -299,6 +339,9 @@ resource chatDeployment 'Microsoft.CognitiveServices/accounts/deployments@2024-1
 resource embeddingDeployment 'Microsoft.CognitiveServices/accounts/deployments@2024-10-01' = {
   parent: foundry
   name: foundryEmbeddingDeployment
+  dependsOn: [
+    chatDeployment
+  ]
   sku: {
     name: 'GlobalStandard'
     capacity: 10
@@ -314,10 +357,14 @@ resource embeddingDeployment 'Microsoft.CognitiveServices/accounts/deployments@2
 }
 
 resource managedEnv 'Microsoft.App/managedEnvironments@2024-10-02-preview' = {
-  name: 'cae-claimpilot-${suffix}'
+  name: 'cae-claimpilot-spoke-${suffix}'
   location: location
   tags: tags
   properties: {
+    vnetConfiguration: {
+      infrastructureSubnetId: containerAppsSubnetId
+      internal: false
+    }
     appLogsConfiguration: {
       destination: 'log-analytics'
       logAnalyticsConfiguration: {
@@ -331,7 +378,10 @@ resource managedEnv 'Microsoft.App/managedEnvironments@2024-10-02-preview' = {
 resource app 'Microsoft.App/containerApps@2024-10-02-preview' = {
   name: appName
   location: location
-  tags: tags
+  tags: union(tags, {
+    'azd-env-name': environmentName
+    'azd-service-name': 'web'
+  })
   identity: {
     type: 'UserAssigned'
     userAssignedIdentities: {

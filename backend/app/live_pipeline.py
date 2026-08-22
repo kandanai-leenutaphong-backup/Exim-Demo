@@ -287,16 +287,15 @@ class LivePipeline:
 
     async def report(self, prior_panels: list[dict[str, Any]]) -> dict[str, Any]:
         from azure.identity import get_bearer_token_provider
-        from openai import AzureOpenAI
+        from openai import OpenAI
 
         token_provider = get_bearer_token_provider(
             self.credential,
             "https://cognitiveservices.azure.com/.default",
         )
-        client = AzureOpenAI(
-            azure_endpoint=required(self.settings.foundry_endpoint, "FOUNDRY_ENDPOINT"),
-            azure_ad_token_provider=token_provider,
-            api_version="v1",
+        client = OpenAI(
+            base_url=f"{required(self.settings.foundry_endpoint, 'FOUNDRY_ENDPOINT').rstrip('/')}/openai/v1/",
+            api_key=token_provider,
         )
         system = (
             "Write exactly three paragraphs in Thai. Use only facts and figures present in the supplied JSON panels. "

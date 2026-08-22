@@ -1,6 +1,7 @@
 import json
 import logging
 import mimetypes
+from io import BytesIO
 from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Annotated
@@ -89,12 +90,9 @@ async def upload(
             raise HTTPException(400, f"{file.filename} is empty.")
         safety = "not_applicable"
         content_type = file.content_type or mimetypes.guess_type(file.filename or "")[0] or ""
-        # Content Safety image analysis applies to uploaded images. PDFs and native
-        # office/text documents continue to Blob Storage after standard file checks.
-        if settings.demo_mode != "cached":
-            if content_type.startswith("image/"):
-                await _content_safety_check(request, content)
-                safety = "passed"
+        if not settings.is_local:
+            await _content_safety_check(request, content, file.filename or "", content_type)
+            safety = "passed"
             if not settings.storage_account_url:
                 raise HTTPException(503, "Blob Storage is not configured.")
             blob = BlobServiceClient(settings.storage_account_url, request.app.state.credential)
@@ -113,15 +111,42 @@ async def upload(
     return panel
 
 
-async def _content_safety_check(request: Request, content: bytes) -> None:
+async def _content_safety_check(
+    request: Request,
+    content: bytes,
+    filename: str,
+    content_type: str,
+) -> None:
     from azure.ai.contentsafety.aio import ContentSafetyClient
-    from azure.ai.contentsafety.models import AnalyzeImageOptions, ImageData
+    from azure.ai.contentsafety.models import AnalyzeImageOptions, AnalyzeTextOptions, ImageData
 
     endpoint = request.app.state.settings.content_safety_endpoint
     if not endpoint:
         raise HTTPException(503, "Content Safety is not configured.")
     async with ContentSafetyClient(endpoint, request.app.state.credential) as client:
-        result = await client.analyze_image(AnalyzeImageOptions(image=ImageData(content=content)))
+        if content_type.startswith("image/"):
+            result = await client.analyze_image(AnalyzeImageOptions(image=ImageData(content=content)))
+        elif filename.lower().endswith(".pdf"):
+            import fitz
+
+            with fitz.open(stream=content, filetype="pdf") as document:
+                preview = document[0].get_pixmap(matrix=fitz.Matrix(1.5, 1.5), alpha=False).tobytes("png")
+            result = await client.analyze_image(AnalyzeImageOptions(image=ImageData(content=preview)))
+        else:
+            if filename.lower().endswith(".xlsx"):
+                from openpyxl import load_workbook
+
+                workbook = load_workbook(BytesIO(content), read_only=True, data_only=True)
+                text = "\n".join(
+                    str(value)
+                    for sheet in workbook.worksheets
+                    for row in sheet.iter_rows(values_only=True)
+                    for value in row
+                    if value is not None
+                )
+            else:
+                text = content.decode("utf-8", errors="replace")
+            result = await client.analyze_text(AnalyzeTextOptions(text=text[:10000]))
     blocked = [item for item in result.categories_analysis if item.severity and item.severity >= 4]
     if blocked:
         raise HTTPException(422, "Upload blocked by the image safety policy.")
