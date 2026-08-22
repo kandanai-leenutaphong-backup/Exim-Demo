@@ -4,6 +4,8 @@ targetScope = 'subscription'
 param environmentName string
 @minLength(1)
 param location string
+@description('Object ID of the azd deployment principal for passwordless ACR push.')
+param principalId string
 @description('Existing single-tenant Entra application client ID. Set through azd env, never source control.')
 param entraClientId string
 @description('Microsoft Entra tenant ID.')
@@ -42,6 +44,7 @@ module resources 'resources.bicep' = {
     environmentName: environmentName
     location: location
     suffix: suffix
+    principalId: principalId
     entraClientId: entraClientId
     entraTenantId: entraTenantId
     foundryChatDeployment: foundryChatDeployment
@@ -56,6 +59,8 @@ module resources 'resources.bicep' = {
 output AZURE_RESOURCE_GROUP string = rg.name
 output AZURE_LOCATION string = location
 output AZURE_CONTAINER_APP_NAME string = resources.outputs.containerAppName
+output AZURE_CONTAINER_REGISTRY_NAME string = resources.outputs.containerRegistryName
+output AZURE_CONTAINER_REGISTRY_ENDPOINT string = resources.outputs.containerRegistryEndpoint
 output SERVICE_WEB_URI string = resources.outputs.uri
 output STORAGE_ACCOUNT_URL string = resources.outputs.storageUrl
 output COSMOS_ENDPOINT string = resources.outputs.cosmosEndpoint

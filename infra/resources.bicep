@@ -1,6 +1,7 @@
 param environmentName string
 param location string
 param suffix string
+param principalId string
 param entraClientId string
 param entraTenantId string
 param foundryChatDeployment string
@@ -22,6 +23,21 @@ resource identity 'Microsoft.ManagedIdentity/userAssignedIdentities@2024-11-30' 
   name: identityName
   location: location
   tags: tags
+}
+
+resource registry 'Microsoft.ContainerRegistry/registries@2023-11-01-preview' = {
+  name: 'acrclaim${suffix}'
+  location: location
+  tags: tags
+  sku: {
+    name: 'Basic'
+  }
+  properties: {
+    adminUserEnabled: false
+    anonymousPullEnabled: false
+    dataEndpointEnabled: false
+    publicNetworkAccess: 'Enabled'
+  }
 }
 
 resource log 'Microsoft.OperationalInsights/workspaces@2023-09-01' = {
@@ -326,6 +342,12 @@ resource app 'Microsoft.App/containerApps@2024-10-02-preview' = {
     managedEnvironmentId: managedEnv.id
     configuration: {
       activeRevisionsMode: 'Single'
+      registries: [
+        {
+          server: registry.properties.loginServer
+          identity: identity.id
+        }
+      ]
       ingress: {
         external: true
         targetPort: 8000
@@ -404,6 +426,8 @@ resource auth 'Microsoft.App/containerApps/authConfigs@2024-10-02-preview' = {
 }
 
 var roleBlobContributor = 'ba92f5b4-2d11-453d-a403-e96b0029c9fe'
+var roleAcrPull = '7f951dda-4ed3-4680-a7ca-43fe172d538d'
+var roleAcrPush = '8311e382-0749-4cb8-b61a-304f252e45ec'
 var roleCosmosDataContributor = '00000000-0000-0000-0000-000000000002'
 var roleCognitiveUser = 'a97b65f3-24c7-4388-baec-2e87135dc908'
 var roleSearchDataContributor = '8ebe5a00-799e-43f5-93ac-243d3dce84a7'
@@ -417,6 +441,25 @@ resource blobRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
     principalId: identity.properties.principalId
     principalType: 'ServicePrincipal'
     roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', roleBlobContributor)
+  }
+}
+
+resource acrPullRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(registry.id, identity.id, roleAcrPull)
+  scope: registry
+  properties: {
+    principalId: identity.properties.principalId
+    principalType: 'ServicePrincipal'
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', roleAcrPull)
+  }
+}
+
+resource acrPushRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(registry.id, principalId, roleAcrPush)
+  scope: registry
+  properties: {
+    principalId: principalId
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', roleAcrPush)
   }
 }
 
@@ -511,6 +554,8 @@ resource vaultRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
 }
 
 output containerAppName string = app.name
+output containerRegistryName string = registry.name
+output containerRegistryEndpoint string = registry.properties.loginServer
 output uri string = 'https://${app.properties.configuration.ingress.fqdn}'
 output storageUrl string = storage.properties.primaryEndpoints.blob
 output cosmosEndpoint string = cosmos.properties.documentEndpoint
