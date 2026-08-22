@@ -1,75 +1,214 @@
-# Six-minute demo runbook
+# ClaimPilot presenter guide
 
-## 0:00 to 0:40, sign in and frame the case
+## The one-sentence story
 
-1. Open ClaimPilot and sign in with the branded Entra page.
-2. Select case `ECI-2026-000125`.
-3. Say: "This case and every document are synthetic. The workflow is realistic,
-   but no customer information is present."
-4. Point to the audit identity and case summary.
+ClaimPilot reads a claim pack, finds the relevant policy rule, shows uncertainty
+instead of hiding it, and prepares evidence for a human officer to decide.
 
-## 0:40 to 1:20, upload and safety
+## Before the audience arrives
 
-1. Open `ข้อมูลกรมธรรม์`.
-2. Drop the eight files from `data/claim_pack`.
-3. As rows appear, say: "Every image is screened before storage, then retained
-   in Blob Storage with an attributable audit event."
-4. Point out that Power of Attorney and Proof of Delivery are intentionally
-   absent.
+1. Open the deployed ClaimPilot URL and sign in.
+2. Open case `ECI-2026-000125`.
+3. Keep `03_bill_of_lading.pdf` ready in another window if you want to show the
+   glare across the shipment date.
+4. Use only the bundled synthetic files in `data/claim_pack`.
+5. Remember the three ideas to repeat:
+   - Document Intelligence reads the documents.
+   - The Foundry IQ grounding pattern finds the policy evidence.
+   - The officer remains responsible for the decision.
 
-## 1:20 to 2:15, classification and OCR
+## 0:00 to 0:40, introduce the business problem
 
-1. Start analysis.
-2. When classification appears, say: "Computer vision identifies what each
-   document is. The completeness result is eight of ten."
-3. **Introduce the degraded bill of lading now.** Open or point to
-   `03_bill_of_lading.pdf`.
-4. Say exactly: "This bright glare crosses the shipment date. A prototype might
-   silently guess. A production system shows uncertainty and stops downstream
-   calculations."
-5. When extraction appears, point to the shipment date warning and its visible
-   confidence below 60 percent.
+**Click:** Sign in, then open `ECI-2026-000125`.
 
-## 2:15 to 3:00, language
+**Say:**
 
-1. When the NLP panel arrives, show Thai and English together.
-2. Say: "Language AI detects both languages, extracts the buyer and shipping
-   delay, and distinguishes a delay explanation from a formal dispute."
+> A claims officer normally has to read many documents, compare dates and
+> amounts, find the right policy condition, and decide what is still missing.
+> ClaimPilot prepares that evidence. It does not approve the claim.
 
-## 3:00 to 3:45, policy grounding
+**Point to:** The case number, claim amount, and assigned officer.
 
-1. When the policy panel arrives, point out that the filing-window result is
-   unverified rather than calculated.
-2. Click the clause chip.
-3. Say: "This is the most important production pattern in the demo. The answer
-   is grounded in the policy and opens the exact clause and page. Because the
-   shipment date is uncertain, the system refuses to claim the 180-day test
-   passed."
+**Audience takeaway:** This is decision support for a person, not autonomous
+claim approval.
 
-## 3:45 to 4:30, screening and score
+## 0:40 to 1:20, show the evidence pack
 
-1. Open `Sanctioned countries`.
-2. Say: "This step is deliberately not AI. It is a deterministic lookup against
-   a versioned illustrative list, so the same input always returns the same
-   result and matched entry."
-3. Point to `ILLUSTRATIVE — NOT AN OFFICIAL SANCTIONS LIST`.
-4. When the score arrives, explain that machine learning uses generated claim
-   history and exposes its top three factors. It does not replace the officer.
+**Click:** Open `เอกสาร`. Upload or point to the eight bundled files.
 
-## 4:30 to 5:25, generated report
+**Say:**
 
-1. Open `AI consultant`.
-2. Read the highlighted sentence stating that the filing deadline cannot be
-   confirmed and `03_bill_of_lading.pdf` must be requested again.
-3. Say: "Generative AI receives only the six panel results. It is forbidden to
-   invent a figure, and uncertainty remains visible in the Thai draft."
+> Every file is synthetic. Before storage, Content Safety checks the upload.
+> The app then keeps the file in Blob Storage and records who performed the
+> action.
 
-## 5:25 to 6:00, decision and production close
+**Point to:** The eight accepted files.
 
-1. Open `สรุป`, enter the officer name, and choose `ขอเอกสารเพิ่มเติม`.
-2. Open History and show timestamps and attribution.
-3. Say: "Production-grade does not mean more AI. It means identity, content
-   safety, managed identity, citations, confidence gates, deterministic
-   controls, telemetry, and an audit trail."
-4. Close with: "Cached mode gives this exact sequence without relying on office
-   Wi-Fi. Live Azure services remain available for the technical follow-up."
+**Say:**
+
+> Two required documents are deliberately missing. This gives the system a
+> useful problem to find rather than a perfect demo case.
+
+**Audience takeaway:** Production AI starts with safe, attributable inputs.
+
+## 1:20 to 1:50, explain the non-AI control
+
+**Click:** Continue to `ตรวจคู่ค้า`.
+
+**Say:**
+
+> This screen is deliberately not AI. A sanctions control must return the same
+> result every time, so it uses an exact lookup against a fictional list.
+
+**Point to:** `RULE-BASED · NOT AI` and
+`ILLUSTRATIVE — NOT AN OFFICIAL SANCTIONS LIST`.
+
+**Audience takeaway:** A good AI solution uses ordinary deterministic rules
+where predictability matters more than creativity.
+
+## 1:50 to 2:15, start the seven-stage analysis
+
+**Click:** `เริ่มการวิเคราะห์`.
+
+**Say:**
+
+> Seven capabilities now contribute one result each. They arrive separately so
+> we can see the work that is normally hidden behind a loading spinner.
+
+**Point to:** The progress count and the two-capability guide.
+
+## 2:15 to 3:10, demonstrate Document Intelligence
+
+**Click:** Expand `02 · OCR` using
+`ดูว่า AI รับอะไร และส่งอะไรออกมา`.
+
+**Point from left to right:**
+
+1. **Input:** Claim form, invoice, bill of lading, and export declaration.
+2. **Process:** Document Intelligence reads text and document structure.
+3. **Output:** Named fields and confidence values.
+
+**Say:**
+
+> Document Intelligence does more than copy text. It returns structured fields
+> such as invoice amount and shipment date, and tells us how confident it is.
+
+**Show:** The 54 percent shipment-date confidence.
+
+**Say exactly:**
+
+> Glare crosses the date on this bill of lading. A prototype might silently
+> guess. ClaimPilot marks it unverified and blocks every calculation that
+> depends on it.
+
+**Optional technical follow-up:** Click `ดูข้อมูล JSON สำหรับทีมเทคนิค` to show
+the actual field-level output and confidence.
+
+**Audience takeaway:** The important capability is not merely OCR. It is
+structured extraction with visible uncertainty.
+
+## 3:10 to 4:05, demonstrate the Foundry IQ grounding pattern
+
+**Click:** Expand `04 · FOUNDRY IQ PATTERN`.
+
+**Point from left to right:**
+
+1. **Input:** The filing-window question plus extracted shipment-date status.
+2. **Process:** Grounded retrieval searches the indexed policy.
+3. **Output:** Clause 7.3, the 180-day rule, and a source location.
+
+**Say:**
+
+> Foundry IQ is the knowledge layer. It connects the question to trusted
+> enterprise content instead of asking a model to answer from memory. In this
+> subscription the demo implements that pattern with Azure AI Search as the
+> grounding fallback.
+
+**Click:** `เปิดหลักฐาน · 08_policy.pdf · ข้อ 7.3 · หน้า 2`.
+
+**Say:**
+
+> The officer can inspect the exact policy page. The system found the rule, but
+> it still refuses to say that the claim passed because Document Intelligence
+> did not verify the shipment date.
+
+**Optional technical follow-up:** Open the JSON to show the structured citation,
+clause, page, answer, and unverified filing-window status.
+
+**Audience takeaway:** Foundry IQ grounds answers in trusted knowledge and makes
+the evidence inspectable.
+
+## 4:05 to 4:35, quickly explain the remaining stages
+
+**Point to each card without opening all of them:**
+
+- **Vision:** Identifies document types and missing evidence.
+- **Language:** Understands Thai and English correspondence.
+- **Rule-based screening:** Produces a repeatable compliance result without an
+  LLM.
+- **Machine learning:** Estimates readiness and shows contributing factors.
+- **Generative AI:** Drafts Thai text only from the six prior panel results.
+
+**Say:**
+
+> Each capability has one narrow job. The value comes from orchestrating them
+> with controls, not from asking one model to do everything.
+
+## 4:35 to 5:20, show the grounded draft
+
+**Click:** Continue to `คำแนะนำ`.
+
+**Say:**
+
+> The model receives only the six inspected results. It cannot introduce a new
+> amount, date, or conclusion. Notice that the uncertainty from the bill of
+> lading remains visible in the Thai draft.
+
+**Point to:** The request for a replacement `03_bill_of_lading.pdf` and the
+policy citation.
+
+**Audience takeaway:** Generative AI turns controlled evidence into readable
+language without removing the guardrails.
+
+## 5:20 to 6:00, return accountability to the officer
+
+**Click:** Continue to `ตัดสินใจ`, enter the officer name, then choose
+`ขอเอกสารเพิ่มเติม`.
+
+**Click:** Open `ประวัติ`.
+
+**Say:**
+
+> The officer makes the final decision. Every panel result has a timestamp and
+> user identity in the audit history. Production-grade AI means identity,
+> evidence, confidence gates, citations, deterministic controls, telemetry, and
+> human accountability.
+
+**Close with:**
+
+> Document Intelligence reads what the customer submitted. The Foundry IQ
+> pattern finds what the policy says. ClaimPilot connects the two, preserves
+> uncertainty, and gives the officer evidence they can verify.
+
+## If someone asks difficult questions
+
+| Question | Short answer |
+|---|---|
+| Does AI approve the claim? | No. It prepares evidence and a draft. The officer decides. |
+| Is the sanctions result generated by AI? | No. It is an exact deterministic lookup for repeatability. |
+| Is this real customer data? | No. Every company, country, document, and history row is synthetic. |
+| What does Document Intelligence add beyond OCR? | Structured fields, document layout understanding, and confidence per extracted value. |
+| What does Foundry IQ add? | A governed knowledge layer that grounds answers in trusted content and returns citations. |
+| Is native Foundry IQ enabled here? | The demo shows the Foundry IQ pattern using Azure AI Search as the supported grounding fallback. |
+| Why not calculate the 180-day result? | Its required shipment date is below the 60 percent confidence gate. |
+| Can this process new real claims today? | No. This deployment is a synthetic, cached demonstration and is not approved for real claim data. |
+| What happens if the network fails? | Cached mode preserves the same seven-stage sequence for a reliable presentation. |
+
+## Presenter rules
+
+- Say "decision support", not "automated decision".
+- Say "grounded answer", not "the AI knows the policy".
+- Say "unverified", not "wrong", when confidence is below the threshold.
+- Describe sanctions screening as rule-based, never as AI.
+- Do not imply that the illustrative sanctions list is official.
+- Do not upload real customer or claim information.

@@ -5,6 +5,7 @@ import {
   BriefcaseBusiness,
   Check,
   CheckCircle2,
+  ChevronDown,
   ChevronRight,
   CircleUserRound,
   Clock3,
@@ -40,6 +41,8 @@ const panelDefaults: AnalysisPanel[] = [
   {
     type: "VISION",
     service: "Azure AI Vision",
+    inputTh: "ภาพหน้าแรกของเอกสาร PDF ทั้ง 8 ไฟล์",
+    processTh: "ดูข้อความ รูปแบบ และลักษณะเอกสาร เพื่อจำแนกประเภทและตรวจความครบถ้วน",
     titleTh: "ตรวจสอบคุณภาพและประเภทเอกสาร",
     titleEn: "Document quality & classification",
     detailTh: "พบเอกสาร 8 จาก 10 รายการ โดยขาดหนังสือมอบอำนาจและหลักฐานการส่งมอบ",
@@ -50,6 +53,8 @@ const panelDefaults: AnalysisPanel[] = [
   {
     type: "OCR",
     service: "Azure AI Document Intelligence",
+    inputTh: "เอกสารเคลม ใบแจ้งหนี้ ใบตราส่ง และใบขนส่งออก",
+    processTh: "อ่านตัวอักษรและโครงสร้างเอกสาร แล้วคืนค่าฟิลด์พร้อมคะแนนความมั่นใจ",
     titleTh: "สกัดข้อมูลจากเอกสาร",
     titleEn: "Document data extraction",
     detailTh: "วันที่ส่งสินค้า 2026-02-12 จาก 03_bill_of_lading.pdf มีความเชื่อมั่นเพียง 54% และต้องตรวจสอบใหม่",
@@ -60,6 +65,8 @@ const panelDefaults: AnalysisPanel[] = [
   {
     type: "NLP",
     service: "Azure AI Language",
+    inputTh: "อีเมลโต้ตอบภาษาไทยและอังกฤษใน 06_correspondence.txt",
+    processTh: "ตรวจภาษา ค้นหาชื่อองค์กร และแยกว่าเป็นคำอธิบายความล่าช้าหรือข้อพิพาท",
     titleTh: "ทำความเข้าใจเหตุการณ์เรียกร้อง",
     titleEn: "Claim narrative understanding",
     detailTh: "ผู้ซื้ออ้างถึงความล่าช้าในการขนส่ง และไม่พบข้อพิพาทอย่างเป็นทางการ",
@@ -70,6 +77,8 @@ const panelDefaults: AnalysisPanel[] = [
   {
     type: "FOUNDRY IQ PATTERN",
     service: "Foundry IQ grounding via Azure AI Search",
+    inputTh: "คำถามเรื่องกำหนดยื่นเคลม พร้อมผลวันที่ส่งสินค้าจาก Document Intelligence",
+    processTh: "ค้นเฉพาะกรมธรรม์ที่จัดทำดัชนีไว้ แล้วคืนคำตอบพร้อมข้อและเลขหน้า",
     titleTh: "ค้นหาคำตอบจากกรมธรรม์พร้อมหลักฐาน",
     titleEn: "Ground the answer in the policy",
     detailTh: "ข้อ 7.3 กำหนดกรอบ 180 วัน แต่ยังยืนยันผลไม่ได้เพราะวันที่ส่งสินค้ามีความเชื่อมั่นต่ำ",
@@ -81,6 +90,8 @@ const panelDefaults: AnalysisPanel[] = [
   {
     type: "RULE-BASED",
     service: "Deterministic local list",
+    inputTh: "ชื่อผู้ซื้อ Zantara Meridian Trading Co.",
+    processTh: "ปรับรูปแบบชื่อแล้วค้นหาแบบตรงตัวในรายการตัวอย่าง โดยไม่เรียก LLM",
     titleTh: "ตรวจสอบเงื่อนไขบังคับ",
     titleEn: "Mandatory condition checks",
     detailTh: "การค้นหาแบบกำหนดตายตัวพบรายการ Zantara Meridian Trading Co. และส่งต่อให้เจ้าหน้าที่",
@@ -91,6 +102,8 @@ const panelDefaults: AnalysisPanel[] = [
   {
     type: "MACHINE LEARNING",
     service: "scikit-learn",
+    inputTh: "จำนวนเอกสาร วันยื่นเคลม ยอดเคลม ระดับความเสี่ยง และประวัติเคลม",
+    processTh: "เปรียบเทียบรูปแบบกับประวัติเคลมสังเคราะห์ 200 เคส และจัดอันดับปัจจัย",
     titleTh: "ประเมินความพร้อมของเคส",
     titleEn: "Case readiness estimate",
     detailTh: "คะแนนความพร้อม 42 จาก 100 ปัจจัยหลักคือเอกสาร 8/10 และแนวโน้มการชำระเงินที่แย่ลง",
@@ -101,6 +114,8 @@ const panelDefaults: AnalysisPanel[] = [
   {
     type: "GENERATIVE AI",
     service: "Microsoft Foundry model",
+    inputTh: "ผลลัพธ์ JSON จากหกขั้นตอนก่อนหน้าเท่านั้น",
+    processTh: "เรียบเรียงร่างภาษาไทยสามย่อหน้า โดยห้ามเพิ่มตัวเลขหรือข้อเท็จจริงใหม่",
     titleTh: "จัดทำข้อเสนอแนะเพื่อการพิจารณา",
     titleEn: "Review recommendation drafting",
     detailTh: "ร่างภาษาไทยระบุชัดว่ายังยืนยันกำหนดยื่นไม่ได้ และต้องขอ 03_bill_of_lading.pdf ใหม่",
@@ -114,6 +129,8 @@ const panelDefaults: AnalysisPanel[] = [
 type AnalysisPanel = {
   type: string;
   service: string;
+  inputTh: string;
+  processTh: string;
   titleTh: string;
   titleEn: string;
   detailTh: string;
@@ -121,6 +138,7 @@ type AnalysisPanel = {
   whyTh: string;
   confidence: number;
   citationPage?: number;
+  rawData?: Record<string, unknown>;
 };
 
 type HistoryRow = {
@@ -216,7 +234,8 @@ function normalizePanel(value: unknown, index: number): AnalysisPanel {
     detailTh,
     detailEn,
     confidence,
-    citationPage
+    citationPage,
+    rawData: data
   };
 }
 
@@ -542,6 +561,8 @@ function AnalysisCard({ panel, index }: { panel: AnalysisPanel; index: number })
   const confidence = Math.round(panel.confidence * 100);
   const showsConfidence = ["VISION", "OCR", "NLP"].includes(panel.type);
   const isFocus = panel.type === "OCR" || panel.type === "FOUNDRY IQ PATTERN";
+  const [open, setOpen] = useState(isFocus);
+  const [showJson, setShowJson] = useState(false);
   return (
     <article className={`analysis-card ${low ? "low-confidence" : ""} ${isFocus ? "capability-focus" : ""}`}>
       <div className="panel-number">{String(index + 1).padStart(2, "0")}</div>
@@ -562,6 +583,39 @@ function AnalysisCard({ panel, index }: { panel: AnalysisPanel; index: number })
         </div>
         <div className="why-it-matters"><strong>เหตุใดจึงสำคัญ</strong><p>{panel.whyTh}</p></div>
         {panel.citationPage && <a className="citation-chip important-citation" href={`/documents/08_policy.pdf#page=${panel.citationPage}`} target="_blank" rel="noreferrer"><FileText size={14} /> เปิดหลักฐาน · 08_policy.pdf · ข้อ 7.3 · หน้า {panel.citationPage}</a>}
+        <button className="inspector-toggle" onClick={() => setOpen((current) => !current)} aria-expanded={open}>
+          <Sparkles size={15} />
+          {open ? "ซ่อนเบื้องหลังการทำงาน" : "ดูว่า AI รับอะไร และส่งอะไรออกมา"}
+          <ChevronDown className={open ? "open" : ""} size={16} />
+        </button>
+        {open && (
+          <div className="ai-inspector">
+            <div className="inspector-flow">
+              <article>
+                <span className="flow-number">1</span>
+                <div><small>INPUT · สิ่งที่ระบบได้รับ</small><strong>{panel.inputTh}</strong></div>
+              </article>
+              <ChevronRight className="flow-arrow" size={20} />
+              <article>
+                <span className="flow-number">2</span>
+                <div><small>PROCESS · สิ่งที่บริการทำ</small><strong>{panel.processTh}</strong></div>
+              </article>
+              <ChevronRight className="flow-arrow" size={20} />
+              <article>
+                <span className="flow-number">3</span>
+                <div><small>OUTPUT · ผลที่ส่งต่อ</small><strong>{panel.detailTh}</strong></div>
+              </article>
+            </div>
+            <div className="inspector-guardrail">
+              <ShieldCheck size={17} />
+              <span><strong>การควบคุม:</strong> {low ? "ผลต่ำกว่า 60% ถูกทำเครื่องหมายว่ายังไม่ยืนยัน และห้ามนำไปคำนวณต่อ" : "ผลลัพธ์ถูกบันทึกพร้อมเวลา ผู้ใช้งาน และแหล่งข้อมูลเพื่อการตรวจสอบย้อนหลัง"}</span>
+            </div>
+            <button className="json-toggle" onClick={() => setShowJson((current) => !current)}>
+              {showJson ? "ซ่อนข้อมูล JSON" : "ดูข้อมูล JSON สำหรับทีมเทคนิค"}
+            </button>
+            {showJson && <pre className="json-view">{JSON.stringify(panel.rawData || { service: panel.service, result: panel.detailEn, confidence: panel.confidence }, null, 2)}</pre>}
+          </div>
+        )}
       </div>
     </article>
   );
