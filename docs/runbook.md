@@ -75,7 +75,18 @@ where predictability matters more than creativity.
 > Seven capabilities now contribute one result each. They arrive separately so
 > we can see the work that is normally hidden behind a loading spinner.
 
-**Point to:** The progress count and the two-capability guide.
+**Point to:** `ดู AI ทำงานทีละขั้น`. Select stages 1 through 7 across the top.
+For each stage, follow the moving dot from the large Input panel, through the
+named service in the center, into the large Output panel. Use
+`เล่นขั้นตอนนี้อีกครั้ง` whenever the audience needs to see the transformation
+again.
+
+**Say:**
+
+> The left side is exactly what this capability receives. The center is the
+> narrow job it performs. The right side is the structured result passed to the
+> next capability. We can inspect each boundary rather than treating AI as one
+> invisible black box.
 
 ## 2:15 to 3:10, demonstrate Document Intelligence
 

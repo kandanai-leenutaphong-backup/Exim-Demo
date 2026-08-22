@@ -16,6 +16,7 @@ import {
   LoaderCircle,
   LogOut,
   Paperclip,
+  Play,
   Search,
   ShieldCheck,
   Sparkles,
@@ -536,6 +537,7 @@ function Analysis({
           <p><strong>จุดสำคัญ:</strong> เมื่อ Document Intelligence ไม่มั่นใจในวันที่ ระบบจะไม่ให้ Foundry IQ สรุปว่าเคสผ่านเงื่อนไข 180 วัน</p>
         </div>
       </div>
+      <AiJourneyVisualizer panels={panels} />
       <div className="analysis-layout">
         <aside className="analysis-progress">
           <strong>{panels.length}<small>/ 7</small></strong>
@@ -556,12 +558,101 @@ function Analysis({
   );
 }
 
+function AiJourneyVisualizer({ panels }: { panels: AnalysisPanel[] }) {
+  const [selected, setSelected] = useState(0);
+  const [replay, setReplay] = useState(0);
+  const stage = panels[selected] || panelDefaults[selected];
+
+  useEffect(() => {
+    if (panels.length) {
+      setSelected(panels.length - 1);
+      setReplay((value) => value + 1);
+    }
+  }, [panels.length]);
+
+  const action = [
+    "ดูรูปแบบและแยกประเภทเอกสาร",
+    "สแกนตำแหน่งข้อความและอ่านค่าฟิลด์",
+    "ทำเครื่องหมายภาษา ชื่อองค์กร และเหตุการณ์",
+    "ค้นคลังความรู้และจัดอันดับข้อความที่เกี่ยวข้อง",
+    "ปรับชื่อให้เป็นรูปแบบเดียวกันแล้วเทียบรายการ",
+    "ประเมินรูปแบบจากคุณลักษณะของเคส",
+    "เรียบเรียงเฉพาะข้อเท็จจริงที่ได้รับอนุญาต"
+  ][selected];
+
+  return (
+    <section className="journey-visualizer">
+      <div className="journey-heading">
+        <div><p className="kicker">WATCH THE TRANSFORMATION</p><h3>ดู AI ทำงานทีละขั้น</h3><p>เลือกหมายเลข แล้วกดเล่นเพื่อดูข้อมูลไหลจาก Input ผ่านบริการ ไปเป็น Output</p></div>
+        <button className="replay-button" onClick={() => setReplay((value) => value + 1)}><Play size={15} /> เล่นขั้นตอนนี้อีกครั้ง</button>
+      </div>
+      <div className="journey-tabs" role="tablist" aria-label="AI processing stages">
+        {panelDefaults.map((item, index) => (
+          <button
+            key={item.type}
+            className={selected === index ? "active" : ""}
+            onClick={() => { setSelected(index); setReplay((value) => value + 1); }}
+            role="tab"
+            aria-selected={selected === index}
+          >
+            <span>{index + 1}</span><strong>{["แยกเอกสาร", "อ่านข้อมูล", "เข้าใจข้อความ", "ค้นกฎ", "เทียบรายการ", "ให้คะแนน", "เขียนร่าง"][index]}</strong>
+          </button>
+        ))}
+      </div>
+      <div className="journey-pipeline" key={`${selected}-${replay}`}>
+        <article className="journey-stage journey-input">
+          <span className="journey-label">1 · INPUT</span>
+          <h4>สิ่งที่ระบบเห็น</h4>
+          <JourneyInput index={selected} />
+          <p>{stage.inputTh}</p>
+        </article>
+        <div className="journey-arrow input-arrow"><i /><span>ส่งเข้า</span></div>
+        <article className="journey-stage journey-process">
+          <span className="journey-label">2 · AI / LOGIC</span>
+          <div className="service-orb"><Sparkles size={24} /><i /><i /><i /></div>
+          <h4>{stage.service}</h4>
+          <p>{action}</p>
+          <div className="processing-status"><LoaderCircle size={14} /> ประมวลผล</div>
+        </article>
+        <div className="journey-arrow output-arrow"><i /><span>ส่งต่อ</span></div>
+        <article className="journey-stage journey-output">
+          <span className="journey-label">3 · OUTPUT</span>
+          <h4>สิ่งที่ระบบส่งออก</h4>
+          <JourneyOutput index={selected} />
+          <p>{stage.detailTh}</p>
+        </article>
+      </div>
+      <div className="journey-caption"><ShieldCheck size={18} /><span><strong>สิ่งที่ต้องอธิบายกับผู้ชม:</strong> {stage.whyTh}</span></div>
+    </section>
+  );
+}
+
+function JourneyInput({ index }: { index: number }) {
+  if (index === 0) return <div className="journey-docs">{["01_claim_form.pdf", "02_commercial_invoice.pdf", "03_bill_of_lading.pdf"].map((file) => <img key={file} src={`/documents/${file}/preview?page=1`} alt="" />)}</div>;
+  if (index === 1) return <div className="journey-scan"><img src="/documents/03_bill_of_lading.pdf/preview?page=1" alt="Bill of lading" /><i /><span>Shipment date row</span></div>;
+  if (index === 2) return <div className="journey-messages"><span>การจัดส่งล่าช้า</span><span>shipping delay</span><span>not a formal dispute</span></div>;
+  if (index === 3) return <div className="journey-query"><Search size={22} /><strong>“กรอบเวลายื่นเคลมกี่วัน?”</strong><small>+ shipment_date: unverified</small></div>;
+  if (index === 4) return <div className="journey-match"><span>Buyer</span><strong>Zantara Meridian Trading Co.</strong><span>Illustrative list</span><strong>Zantara Meridian Trading Co.</strong></div>;
+  if (index === 5) return <div className="journey-features">{["Documents 8/10", "Aging worsening", "Confidence 54%", "Prior claims 1"].map((item, itemIndex) => <span key={item}><i style={{ width: `${[80, 72, 54, 20][itemIndex]}%` }} />{item}</span>)}</div>;
+  return <div className="journey-panel-chips">{["Vision", "OCR", "Language", "Policy", "Screening", "Score"].map((item) => <span key={item}><Check size={12} />{item}</span>)}</div>;
+}
+
+function JourneyOutput({ index }: { index: number }) {
+  if (index === 0) return <div className="journey-big-result"><strong>8 / 10</strong><span>documents present</span><small>2 missing</small></div>;
+  if (index === 1) return <div className="journey-big-result warning-result"><strong>54%</strong><span>shipment_date</span><small>BLOCKED</small></div>;
+  if (index === 2) return <div className="journey-tags"><span>Thai</span><span>English</span><span>Organization</span><span>Delay event</span><strong>No formal dispute</strong></div>;
+  if (index === 3) return <div className="journey-citation"><FileText size={26} /><strong>Clause 7.3</strong><span>Page 2 · 180 days</span><small>Case result: UNVERIFIED</small></div>;
+  if (index === 4) return <div className="journey-big-result warning-result"><strong>REFER</strong><span>Exact match</span><small>Same result every time</small></div>;
+  if (index === 5) return <div className="journey-big-result"><strong>42</strong><span>/ 100 readiness</span><small>MANUAL REVIEW</small></div>;
+  return <div className="journey-report"><FileText size={24} /><p>กำหนดยื่นยังไม่ได้รับการยืนยัน ต้องขอ B/L ใหม่</p><small>Thai draft · 3 paragraphs</small></div>;
+}
+
 function AnalysisCard({ panel, index }: { panel: AnalysisPanel; index: number }) {
   const low = panel.confidence < 0.6;
   const confidence = Math.round(panel.confidence * 100);
   const showsConfidence = ["VISION", "OCR", "NLP"].includes(panel.type);
   const isFocus = panel.type === "OCR" || panel.type === "FOUNDRY IQ PATTERN";
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
   const [showJson, setShowJson] = useState(false);
   return (
     <article className={`analysis-card ${low ? "low-confidence" : ""} ${isFocus ? "capability-focus" : ""}`}>
